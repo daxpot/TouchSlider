@@ -1,0 +1,319 @@
+<script>
+function init_viewport()
+{
+    if(/Android (\d+\.\d+)/.test(navigator.userAgent))
+    {
+        var version = parseFloat(RegExp.$1);
+
+        if(version>2.3)
+        {
+            var width = window.outerWidth == 0 ? window.screen.width : window.outerWidth;
+            var phoneScale = parseInt(width)/500;
+            document.write('<meta name=\"viewport\" content=\"width=500, minimum-scale = '+ phoneScale +', maximum-scale = '+ phoneScale +', target-densitydpi=device-dpi\">');
+        }
+        else
+        {
+            document.write('<meta name=\"viewport\" content=\"width=500, target-densitydpi=device-dpi\">');    
+        }
+    }
+    else if(navigator.userAgent.indexOf('iPhone') != -1)
+    {
+        var phoneScale = parseInt(window.screen.width)/500;
+        document.write('<meta name=\"viewport\" content=\"width=500; height=$height; initial-scale=' + phoneScale +'; user-scalable=no\" /> ');         //0.75   0.82
+    }
+    else 
+    {
+        document.write('<meta name=\"viewport\" content=\"width=500, height=$height,initial-scale=0.64\" /> ');         //0.75   0.82
+
+    }
+}
+init_viewport();
+</script>
+<script type="text/javascript">
+	var images = [
+		"image/1.jpg",
+		"image/2.jpg",
+		"image/3.jpg",
+		"image/4.jpg",
+		"image/5.jpg",
+		"image/7.jpg",
+		"image/8.jpg",
+		"image/9.jpg",
+		"image/10.png",
+		"image/11.png",
+		"image/12.png"
+	]
+</script>
+
+<div id="swiper">
+	<div></div>
+	<div></div>
+	<div></div>
+	<div></div>
+	<div></div>
+</div>
+<button onclick="next()">next</button>
+<style type="text/css">
+	body {
+		background-color: black;
+		margin: 0px;
+	}
+	#swiper {
+		position: relative;
+		width: 500px;
+		height: 400px;
+		background-color: #ccc;
+		overflow: hidden;
+	}
+	#swiper div{
+		position: absolute;
+		width: 300px;
+		height: 90%;
+		background-position: center;
+		background-size: cover;
+		left: 50%;
+		margin-left: -150px;
+		top:5%;
+	}
+	.swiper-center {
+		z-index: 2;
+		-webkit-transform:scale(1) translateX(0px);
+	}
+	.swiper-left {
+		z-index: 1;
+		-webkit-transform:scale(0.8) translateX(-400px);
+	}
+	.swiper-right {
+		z-index: 1;
+		-webkit-transform:scale(0.8) translateX(400px);
+	}
+	.swiper-waitleft {
+		-webkit-transform:scale(0.8) translateX(-800px);
+	}
+	.swiper-waitright {
+		-webkit-transform:scale(0.8) translateX(800px);
+	}
+
+	@-webkit-keyframes centerLeft {
+		to{
+			-webkit-transform:scale(0.8) translateX(-400px);
+		}
+	}
+	@-webkit-keyframes leftLeft {
+		to{
+			-webkit-transform:scale(0.8) translateX(-800px);
+		}
+	}
+	@-webkit-keyframes rightLeft {
+		to {
+			-webkit-transform:scale(1) translateX(0px);
+		}
+	}
+	@-webkit-keyframes waitRightLeft{
+		to {
+			-webkit-transform:scale(0.8) translateX(400px);
+		}
+	}
+	@-webkit-keyframes centerRight {
+		to{
+			-webkit-transform:scale(0.8) translateX(400px);
+		}
+	}
+	@-webkit-keyframes leftRight {
+		to{
+			-webkit-transform:scale(1) translateX(0px);
+		}
+	}
+	@-webkit-keyframes rightRight {
+		to {
+			-webkit-transform:scale(0.8) translateX(800px);
+		}
+	}
+	@-webkit-keyframes waitLeftRight{
+		to {
+			-webkit-transform:scale(0.8) translateX(-400px);
+		}
+	}
+</style>
+<script type="text/javascript">
+	;(function(w){
+		var objid = function(id) {
+			return document.getElementById(id);
+		}
+
+		var classes = [
+			"swiper-waitleft",
+			"swiper-left",
+			"swiper-center",
+			"swiper-right",
+			"swiper-waitright"
+		];
+
+		var leftKeyframes = [
+			"none",
+			"leftLeft",
+			"centerLeft",
+			"rightLeft",
+			"waitRightLeft"
+		]
+
+		var rightKeyframes = [
+			"waitLeftRight",
+			"leftRight",
+			"centerRight",
+			"rightRight",
+			"none"
+		]
+
+		w.Swiper = function(id, images){
+			this.id = id;
+			this.images = images;
+			this._init();
+		}
+		w.Swiper.prototype = {
+			_init: function() {
+				this.dom = objid(this.id);
+				this.divs = this.dom.children;
+				this.animating = false;
+				this.bTouch = false;
+				this.index =  0;
+				for(var i = 0;i<this.divs.length;i++) {
+					this.divs[i].style.backgroundImage = "url(" + this.images[(i+this.images.length-1)%this.images.length] + ")";
+					this.divs[i].className = classes[i];
+				}
+				this.dom.ontouchstart = this.dom.onmousedown = this._touchstart.bind(this);
+				this.dom.ontouchmove = this.dom.onmousemove = this._touchmove.bind(this);
+				this.dom.ontouchend = this.dom.onmouseup = this._touchend.bind(this);
+			},
+			_touchstart: function(event) {
+				if(this.animating) {
+					return;
+				}
+				this.startX = event.touches ? event.touches[0].pageX : event.pageX;
+				this.bTouch = true;
+				event.preventDefault();
+			},
+			_touchmove: function(event) {
+				if(this.animating || this.bTouch == false) {
+					return;
+				}
+				this.endX = event.touches ? event.touches[0].pageX : event.pageX;
+
+				var dec = this.endX - this.startX;
+				var absDec = Math.abs(dec);
+				var speed = 0.2/400;
+
+				var scales = [0.8, 0.8, 1, 0.8, 0.8];
+				scales[0] = dec >= 400 ? (dec-400)*speed + 0.8 : 0.8;
+				scales[0] > 1 ? scales[0] = 1 : true;
+
+				scales[1] = dec > 0 ? dec*speed + 0.8 : 0.8;
+				dec > 400 ? scales[1] = 1 - (dec-400)*speed : true;
+				
+				scales[2] = 1-speed*absDec;
+				scales[2] < 0.8 ? scales[2] = 0.8 : true;
+
+				scales[3] = dec < 0 ? -dec*speed + 0.8 : 0.8;
+				dec < -400 ? scales[3] = 1 + (dec - 400)*speed : true;
+
+				scales[4] = dec <= -400 ? (400-dec)*speed + 0.8 : 0.8;
+				scales[4] > 1 ? scales[4] = 1 : true;
+
+				var trans = [-800 + dec, -400 + dec, dec, 400+dec, 800+dec];
+				console.log(trans);
+				console.log(scales);
+				for(var i=0;i<this.divs.length;i++) {
+					this.divs[i].style.webkitTransition = "all 0s";
+					this.divs[i].style.webkitTransform = "scale(" + scales[i] + ") translate(" + trans[i] + "px, 0px) translateZ(0px)";
+				}
+
+				event.preventDefault();
+			},
+			_touchend: function(event) {
+				this.bTouch = false;
+				var dec = this.endX - this.startX;
+				var absDec = Math.abs(dec);
+				if(dec > 80) {
+					this._turnRight(200);
+				}
+				else if(dec > -80) {
+					this.animating = true;
+
+					for(var i=0;i<this.divs.length;i++) {
+						this.divs[i].style.webkitTransition = "transform 0.1s ease-out";
+					}
+					setTimeout(function(){
+						for(var i=0;i<this.divs.length;i++) {
+							this.divs[i].style.webkitTransform = "";
+						}	
+						setTimeout(function(){
+							for(var i=0;i<this.divs.length;i++) {
+								this.divs[i].style.webkitTransition = "";
+							}
+							this.animating = false;
+						}.bind(this), 200);
+					}.bind(this), 50);
+				}
+				else {
+					this._turnLeft(200);
+				}
+				event.preventDefault();
+			},
+			_turnLeft: function(time) {
+				if(this.animating) {
+					return;
+				}
+				time == undefined ? time = 400 : true;
+				this.animating = true;
+
+				for(var i = 0;i<this.divs.length;i++) {
+					this.divs[i].style.webkitAnimation = leftKeyframes[i] + " " + time/1000 + "s ease-out 0s 1 both";
+				}
+				setTimeout(function(){
+					this.index++;
+					this.dom.insertBefore(this.divs[0], null);
+
+					for(var i = 0;i<this.divs.length;i++) {
+						this.divs[i].style.backgroundImage = "url(" + this.images[(i+this.images.length-1 + this.index)%this.images.length] + ")";
+						this.divs[i].className = classes[i];
+						this.divs[i].style.webkitAnimation = "";
+						this.divs[i].style.webkitTransform = "";
+					}
+
+					this.animating = false;
+				}.bind(this), time + 100);
+			},
+			_turnRight: function(time) {
+				if(this.animating) {
+					return;
+				}
+				time == undefined ? time = 400 : true;
+				this.animating = true;
+
+				for(var i = 0;i<this.divs.length;i++) {
+					this.divs[i].style.webkitAnimation = rightKeyframes[i] + " " + time/1000 + "s ease-out 0s 1 both";
+				}
+				setTimeout(function(){
+					this.index = (this.index - 1 + this.images.length) % this.images.length;
+					this.dom.insertBefore(this.divs[this.divs.length-1], this.divs[0]);
+
+					for(var i = 0;i<this.divs.length;i++) {
+						this.divs[i].style.backgroundImage = "url(" + this.images[(i+this.images.length-1 + this.index)%this.images.length] + ")";
+						this.divs[i].className = classes[i];
+						this.divs[i].style.webkitAnimation = "";
+						this.divs[i].style.webkitTransform = "";
+					}
+
+					this.animating = false;
+				}.bind(this), time + 100);
+			}
+		}
+	})(window);
+
+	var s = new Swiper("swiper", images);
+
+	function next(){
+		s._turnRight();
+	}
+	
+</script>
