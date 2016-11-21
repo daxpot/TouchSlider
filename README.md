@@ -10,4 +10,4 @@
 
 
 具体效果参见
-zengkv.com/TouchSlider/
+[zengkv.com/TouchSlider/](http://zengkv.com/TouchSlider/)
