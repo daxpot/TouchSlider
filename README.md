@@ -8,6 +8,8 @@
 
 经过研究发现，在触摸的时候修改transform加上  translateZ(0px)后掉帧的情况则不见了。
 
+经Google发现原来是因为加上类似translateZ(0px),有助于开启硬件加速。
+
 
 具体效果参见
 [zengkv.com/TouchSlider/](http://zengkv.com/TouchSlider/)
