@@ -10,4 +10,4 @@
 
 
 具体效果参见
-https://github.com/TouchSlider/
+zengkv.com/TouchSlider/
