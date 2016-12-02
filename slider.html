@@ -165,6 +165,7 @@ init_viewport();
 					return;
 				}
 				this.startY = event.touches ? event.touches[0].pageY : event.pageY;
+				this.endY = this.startY;
 				this.bTouch = true;
 				event.preventDefault();
 			},
