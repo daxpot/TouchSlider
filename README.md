@@ -13,3 +13,8 @@
 
 具体效果参见
 [zengkv.com/TouchSlider/](http://zengkv.com/TouchSlider/)
+
+
+slider.html也是用来循环播放图片的，其增加了自定义每一个页面，以及每个页面多图播放
+具体效果参见
+[zengkv.com/TouchSlider/slider.html](http://zengkv.com/TouchSlider/slider.html)
